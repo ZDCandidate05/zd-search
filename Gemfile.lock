@@ -1,0 +1,17 @@
+PATH
+  remote: .
+  specs:
+    zd-search (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  zd-search!
+
+BUNDLED WITH
+   1.11.2

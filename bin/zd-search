@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+# The usual boilerplate needed to put our lib directory on the load path
+# and begin executing the application from it.
+realpath = File.symlink?(__FILE__) ? File.realpath(__FILE__) : __FILE__
+here = File.dirname(realpath)
+$LOAD_PATH << File.expand_path(File.join(here, '../lib'))
+require 'zd-search'
+ZDSearch::CLI.new.run!
