@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
     s.email = 'kjtsanaktsidis@gmai..com'
 
     s.executables = 'zd-search'
-    s.files = Dir['bin/*'] + Dir['lib/**/*.rb'] + Dir['test/**/*.rb']
+    s.files = Dir['bin/*'] + Dir['lib/**/*.rb'] + Dir['spec/**/*.rb']
 end
