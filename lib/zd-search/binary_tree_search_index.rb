@@ -45,7 +45,12 @@ module ZDSearch
 
                 # Put the matches into the appropriate index depending on token type
                 matches_by_token.each do |token, match_list|
-                    index = @index_trees[ZDSearch::BinaryTreeSearchIndex._symbol_for_type(token.class)]
+                    index_type = ZDSearch::BinaryTreeSearchIndex._symbol_for_type(token.class)
+                    index = @index_trees[index_type]
+                    # True/false don't support greater than/less than operators on each other. So,
+                    # we have to store them in the binary tree as zero/one - but they still need to be in their own
+                    # tree so we don't return integers when looking for bools (or vice versa)
+                    token = (token ? 1 : 0) if index_type == :boolean
                     existing_matches = index[token] ||= []
                     # Mutates existing_matches in-place to avoid having to look it up
                     # in the tree again
@@ -74,7 +79,10 @@ module ZDSearch
             search_term = @tokeniser.tokens_for_value(search_term).first
             return [] if search_term.nil?
 
-            index = @sorted_index_trees[ZDSearch::BinaryTreeSearchIndex._symbol_for_type(search_term.class)]
+            index_type = ZDSearch::BinaryTreeSearchIndex._symbol_for_type(search_term.class)
+            index = @sorted_index_trees[index_type]
+            # Map back to 1/0 for tree storage again (see #index above)
+            search_term = (search_term ? 1 : 0) if index_type == :boolean
             matches = index[search_term]
             return [] if matches.nil?
 

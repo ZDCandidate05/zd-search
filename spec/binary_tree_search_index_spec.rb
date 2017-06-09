@@ -12,15 +12,17 @@ describe ZDSearch::BinaryTreeSearchIndex do
         'bork' => 'Some super long and DESCRIPTIVE text',
         'quark' => 'Less borkey text',
         'is_quack' => true,
-        'honk' => [ 'Other', 'Pieces' ]
+        'honk' => [ 'Other', 'Pieces' ],
+        'eek' => 4,
     } }
 
     let(:o2) { {
         'oink' => 34,
         'bork' => 'LESS USEFUL but more interesting text.',
         'quark' => 'Definitely does not have the t-word.',
-        'is_quack' => true,
-        'honk' => [ 'Other', 'Pieces' ]
+        'is_quack' => false,
+        'honk' => [ 'Other', 'Pieces' ],
+        'eek' => 1,
     } }
 
     let(:o3) { {
@@ -28,7 +30,8 @@ describe ZDSearch::BinaryTreeSearchIndex do
         'bork' => "definitely borks (and barks, can't it?) pretty hard.",
         'quark' => '',
         'is_quack' => true,
-        'honk' => [ 'Other', 'Pieces' ]
+        'honk' => [ 'Other', 'Pieces' ],
+        'eek' => 0,
     } }
 
     describe 'string searches' do
@@ -101,6 +104,38 @@ describe ZDSearch::BinaryTreeSearchIndex do
             ix = @index_builder.build_index!
             matches = ix.matches_for(345)
             expect(matches).to have(0).items
+        end
+    end
+
+    describe 'boolean matches' do
+        it 'only returns exact boolean matches' do
+            @index_builder.index(o1)
+            @index_builder.index(o2)
+            @index_builder.index(o3)
+            ix = @index_builder.build_index!
+            matches = ix.matches_for(true, restrict_field: 'is_quack')
+            expect(matches).to have(2).items
+            expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o1, 'is_quack'))
+            expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o3, 'is_quack'))
+        end
+
+        it 'returns no matches if none exist' do
+            @index_builder.index(o1)
+            @index_builder.index(o3)
+            ix = @index_builder.build_index!
+            matches = ix.matches_for(false, restrict_field: 'is_quack')
+            expect(matches).to have(0).items
+        end
+
+        it 'does not accidently return integers' do
+            @index_builder.index(o1)
+            @index_builder.index(o2)
+            @index_builder.index(o3)
+            ix = @index_builder.build_index!
+            matches = ix.matches_for(false)
+            expect(matches).to have(1).items
+            expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o2, 'is_quack'))
+            expect(matches).to_not include(ZDSearch::BinaryTreeSearchIndex::Match.new(o3, 'eek'))
         end
     end
 

@@ -136,6 +136,6 @@ module ZDSearch
                 create_balanced_copy_subtree(elements: elements[0...(centre_ix)]),
                 create_balanced_copy_subtree(elements: elements[(centre_ix+1)..-1]),
             )
-        end        
+        end
     end
 end
