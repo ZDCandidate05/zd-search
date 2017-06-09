@@ -1,4 +1,3 @@
-# Jumping-off-point to require all the rest of our code
+# Jumping-off-point to require code we want to expose
 
-require 'zd-search/binary_tree'
 require 'zd-search/cli'

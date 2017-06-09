@@ -57,8 +57,6 @@ module ZDSearch
 
         private
 
-        attr_accessor :root
-
         def set(key, value)
             if @root.nil?
                 @root = Node.new(key, value)

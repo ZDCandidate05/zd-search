@@ -1,4 +1,4 @@
-require 'zd-search'
+require 'zd-search/binary_tree'
 
 describe ::ZDSearch::BinaryTree do
     describe '#[] and #[]=' do
