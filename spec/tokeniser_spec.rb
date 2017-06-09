@@ -61,6 +61,21 @@ describe ZDSearch::Tokeniser do
             tokens = tk.tokens_for_value("")
             expect(tokens).to eql([""])
         end
+
+        it 'strips almost all punctuation except for \'' do
+            tk = ZDSearch::Tokeniser.new
+            tokens = tk.tokens_for_value("This string has compound-words (and brackets) and ends with a full stop.")
+            expect(tokens).to eql([
+                'this', 'string', 'has', 'compound', 'words', 'and',
+                'brackets','and','ends', 'with', 'a', 'full', 'stop'
+            ])
+        end
+
+        it 'does not strip out punctuation fron contractions' do
+            tk = ZDSearch::Tokeniser.new
+            tokens = tk.tokens_for_value("The contraction shouldn't be split up.")
+            expect(tokens).to eql(['the', 'contraction', "shouldn't", 'be', 'split', 'up'])
+        end
     end
 
     describe 'Tokenising arrays' do

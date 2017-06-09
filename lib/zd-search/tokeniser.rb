@@ -6,7 +6,9 @@
 module ZDSearch
     class Tokeniser
 
-        STRING_TOKENIZE_PATTERN = /\s/
+        # This would be in dire need of internationalisation in the real world -
+        # probably by reading up on the appropriate unicode character classes
+        STRING_TOKENIZE_PATTERN = /[^A-Za-z0-9']/
 
         def tokens_for_value(value)
             # Numbers & booleans just tokenise to themselves
@@ -15,6 +17,9 @@ module ZDSearch
             elsif value.is_a?(String)
                 # If this were a real search app, we'd do things like stemming and ignoring
                 # stopwords here. We don't need to support any of that however :)
+                # Note that STRING_TOKENISE_PATTERN includes not only includes things you'd think
+                # we split on, like whitespace, but also characters like - and ., so that "foo."
+                # at the end of a sentence tokenises to "foo"
                 tokens = value.split(STRING_TOKENIZE_PATTERN)
                             .reject(&:empty?)
                             .map(&:downcase)
