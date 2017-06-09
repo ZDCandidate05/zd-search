@@ -8,4 +8,6 @@ Gem::Specification.new do |s|
 
     s.executables = 'zd-search'
     s.files = Dir['bin/*'] + Dir['lib/**/*.rb'] + Dir['spec/**/*.rb']
+
+    s.add_dependency('trollop', '~> 2')
 end
