@@ -7,8 +7,15 @@ require 'zd-search'
 module ZDSearch
     module CommandParser
         SearchCommand = Struct.new('SearchCommand', :type, :field, :term)
-
         class SearchCommandError < StandardError
+            def initialize(code)
+                @code = code
+            end
+            attr_reader :code
+        end
+
+        FieldsCommand = Struct.new('FieldsCommand', :type)
+        class FieldsCommandError < StandardError
             def initialize(code)
                 @code = code
             end
@@ -54,6 +61,18 @@ module ZDSearch
             end
 
             return result
+        end
+
+        def self.parse_fields_command(command_tokens)
+            field = command_tokens[1]
+            raise FieldsCommandError.new(:err_no_object_type) unless field
+            if !ZDSearch::OBJECT_TYPES.include?(field)
+                raise FieldsCommandError.new(:err_invalid_object_type)
+            end
+
+            raise FieldsCommandError.new(:err_extra_arguments) if command_tokens.size > 2
+
+            return FieldsCommand.new(field)
         end
     end
 end
