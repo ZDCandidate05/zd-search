@@ -9,6 +9,20 @@ module ZDSearch
     class CLI
 
         DEFAULT_DATA_DIR = File.realpath(File.join(File.dirname(__FILE__), '../../data'))
+        COMMANDS = %w(fields search exit help)
+        OBJECT_TYPES = %w(organisation ticket user)
+        INTERACTIVE_HELP = <<~EOS
+            To discover what fields are available to query
+                > fields {#{OBJECT_TYPES.join("|")}}
+            To query on a particular object type/field pair
+                > search {#{OBJECT_TYPES.join("|")}}.FIELD SEARCH_TERM
+            To exit
+                > exit
+                or
+                > ^D
+            To see this help again
+                > help
+        EOS
 
         def initialize
             self_spec = Gem::Specification.load('zd-search.gemspec')
@@ -52,15 +66,33 @@ module ZDSearch
             time_delta_in_ms = ((Time.now - t1).to_f * 1000).round  
             puts "Done (in #{time_delta_in_ms} ms)."
 
+            puts
+            puts "Now dropping to the search shell."
+            STDOUT.write INTERACTIVE_HELP
+
 
             # According to the ruby readline docs, we need to save the terminal state & restore it on exit.
             # Ignore a failure - if your system does not have /bin/stty (Windows?), you'll just have to deal with
             # broken terminal state if you CTRL+C
             stty_current_state = `stty --save`.chomp rescue nil
+            Readline.completion_proc = method(:completion)
             begin
                 while line = Readline.readline("zd-search> ", true)
-                    puts "Yup, I'm definitely going to '#{line}'."
-                    sleep 5
+                    command_tokens = line.split(' ')
+                    case command_tokens.first
+                    when 'fields'
+                        puts "Comming soon."
+                    when 'search'
+                        puts "Comming soon."
+                    when 'exit'
+                        break # Bail out of readline while loop
+                    when 'help'
+                        STDOUT.write INTERACTIVE_HELP
+                    when nil
+                        # Do nothing; you'll just get a new prompt.
+                    else
+                        puts "Unknown command #{command_tokens.first}. Try `help` for help."
+                    end
                 end
             rescue Interrupt
                 # Interactive terminals tend to treat CTRL+C as "bin this line and start again"
@@ -98,6 +130,13 @@ module ZDSearch
                 index_builder.index(object)
             end
             return index_builder
+        end
+
+        # Returns suggestions for readline completion. There's a whole lot more we could do to make this
+        # more ergonomic, but it's messy & ugly & not really nescessary. As it is, just complete the main
+        # initial commands.
+        def completion(prefix)
+            return COMMANDS.grep(/^#{Regexp.escape(prefix)}/)
         end
     end
 end
