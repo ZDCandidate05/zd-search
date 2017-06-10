@@ -1,6 +1,7 @@
 require 'trollop'
 require 'rubygems'
 require 'json'
+require 'readline'
 require 'zd-search/binary_tree_search_index'
 require 'zd-search/tokeniser'
 
@@ -50,6 +51,27 @@ module ZDSearch
 
             time_delta_in_ms = ((Time.now - t1).to_f * 1000).round  
             puts "Done (in #{time_delta_in_ms} ms)."
+
+
+            # According to the ruby readline docs, we need to save the terminal state & restore it on exit.
+            # Ignore a failure - if your system does not have /bin/stty (Windows?), you'll just have to deal with
+            # broken terminal state if you CTRL+C
+            stty_current_state = `stty --save`.chomp rescue nil
+            begin
+                while line = Readline.readline("zd-search> ", true)
+                    puts "Yup, I'm definitely going to '#{line}'."
+                    sleep 5
+                end
+            rescue Interrupt
+                # Interactive terminals tend to treat CTRL+C as "bin this line and start again"
+                # whilst also terminating any in-progress operation
+                puts "\n"
+                retry
+            ensure
+                if stty_current_state
+                    system 'stty', stty_current_state rescue nil
+                end
+            end
         end
 
         # This method opens up the files specified on the command line and parses them.
