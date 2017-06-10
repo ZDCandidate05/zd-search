@@ -2,20 +2,21 @@ require 'trollop'
 require 'rubygems'
 require 'json'
 require 'readline'
+require 'zd-search'
 require 'zd-search/binary_tree_search_index'
 require 'zd-search/tokeniser'
+require 'zd-search/command_parser'
 
 module ZDSearch
     class CLI
 
         DEFAULT_DATA_DIR = File.realpath(File.join(File.dirname(__FILE__), '../../data'))
         COMMANDS = %w(fields search exit help)
-        OBJECT_TYPES = %w(organisation ticket user)
         INTERACTIVE_HELP = <<~EOS
             To discover what fields are available to query
-                > fields {#{OBJECT_TYPES.join("|")}}
+                > fields {#{ZDSearch::OBJECT_TYPES.join("|")}}
             To query on a particular object type/field pair
-                > search {#{OBJECT_TYPES.join("|")}}.FIELD SEARCH_TERM
+                > search {#{ZDSearch::OBJECT_TYPES.join("|")}}.FIELD SEARCH_TERM
             To exit
                 > exit
                 or
@@ -61,7 +62,7 @@ module ZDSearch
             search_index_builder = index_objects(zendesk_data)
 
             puts "Optimising index..."
-            search_index = search_index_builder.build_index!
+            @search_index = search_index_builder.build_index!
 
             time_delta_in_ms = ((Time.now - t1).to_f * 1000).round  
             puts "Done (in #{time_delta_in_ms} ms)."
@@ -81,14 +82,14 @@ module ZDSearch
                     command_tokens = line.split(' ')
                     case command_tokens.first
                     when 'fields'
-                        puts "Comming soon."
+                        run_fields_command command_tokens
                     when 'search'
-                        puts "Comming soon."
+                        run_search_command command_tokens
                     when 'exit'
                         break # Bail out of readline while loop
                     when 'help'
                         STDOUT.write INTERACTIVE_HELP
-                    when nil
+                    when nil 
                         # Do nothing; you'll just get a new prompt.
                     else
                         puts "Unknown command #{command_tokens.first}. Try `help` for help."
@@ -137,6 +138,14 @@ module ZDSearch
         # initial commands.
         def completion(prefix)
             return COMMANDS.grep(/^#{Regexp.escape(prefix)}/)
+        end
+
+        def run_search_command(tokenised_command)
+
+        end
+
+        def run_fields_command(tokenised_command)
+            puts "Comming soon."
         end
     end
 end
