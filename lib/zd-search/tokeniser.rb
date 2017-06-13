@@ -11,7 +11,13 @@ module ZDSearch
         # TODO: relax this something serious. Otherwise stuff'l break
         STRING_TOKENIZE_PATTERN = /[^A-Za-z0-9']/
 
-        def tokens_for_value(value)
+        # A list of field names which should not get tokenisation applied - this is so
+        # things like URL's and UUIDs can match properly.
+        LITERAL_FIELDS = %w(url _id email domain_names external_id)
+
+        def tokens_for_value(value, field_name = nil)
+            return [value] if LITERAL_FIELDS.include?(field_name)
+
             # Numbers & booleans just tokenise to themselves
             if value.is_a?(Integer) || value.is_a?(Float) || value == true || value == false
                 return [value]

@@ -37,7 +37,7 @@ module ZDSearch
             def index(hash)
                 matches_by_token = {}
                 hash.each do |field_name, value|
-                    @tokeniser.tokens_for_value(value).each do |token|
+                    @tokeniser.tokens_for_value(value, field_name).each do |token|
                         matches_by_token[token] ||= []
                         matches_by_token[token] << Match.new(hash, field_name)
                     end
@@ -76,7 +76,7 @@ module ZDSearch
         # Specify restrict_field to restrict returned matches to a particular field.
         def matches_for(search_term, restrict_field: nil, restrict_type: nil)
             # Tokenise the search term, so that it will match the format of what we indexed
-            search_term = @tokeniser.tokens_for_value(search_term).first
+            search_term = @tokeniser.tokens_for_value(search_term, restrict_field).first
             return [] if search_term.nil?
 
             index_type = ZDSearch::BinaryTreeSearchIndex._symbol_for_type(search_term.class)

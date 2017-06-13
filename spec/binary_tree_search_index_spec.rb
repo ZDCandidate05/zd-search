@@ -24,6 +24,7 @@ describe ZDSearch::BinaryTreeSearchIndex do
         'is_quack' => false,
         'honk' => [ 'Other', 'Pieces' ],
         'eek' => 1,
+        'url' => 'https://google.com/a-great-page.html',
         '_type' => 'eel',
     } }
 
@@ -85,6 +86,18 @@ describe ZDSearch::BinaryTreeSearchIndex do
             matches = ix.matches_for('')
             expect(matches).to have(1).item
             expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o3, 'quark'))
+        end
+
+        context 'the field is one of the LITERAL_FIELDS' do
+            it 'performs the search with no tokenisation' do
+                @index_builder.index(o1)
+                @index_builder.index(o2)
+                @index_builder.index(o3)
+                ix = @index_builder.build_index!
+                matches = ix.matches_for('https://google.com/a-great-page.html', restrict_field: 'url')
+                expect(matches).to have(1).item
+                expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o2, 'url'))
+            end
         end
     end
 
