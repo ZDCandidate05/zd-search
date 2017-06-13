@@ -5,7 +5,7 @@ require 'readline'
 require 'zd-search'
 require 'zd-search/binary_tree_search_index'
 require 'zd-search/tokeniser'
-require 'zd-search/command_parser'
+require 'zd-search/commands'
 
 module ZDSearch
     class CLI
@@ -141,7 +141,19 @@ module ZDSearch
         end
 
         def run_search_command(tokenised_command)
+            # Delegate to a SearchCommand object
+            cmd = ZDSearch::SearchCommand.new(tokenised_command)
+            results = cmd.execute(@search_index)
 
+            printf "%-20s %s\n", "Field name", "Value"
+            printf "-----------------------------\n"
+            results.each do |row|
+                row.keys.sort.each do |field_name|
+                    printf "%-20s %s\n", field_name, JSON.dump(row[field_name])
+                end
+                printf "-----------------------------\n"
+            end
+            puts "(found #{results.size} result(s))"
         end
 
         def run_fields_command(tokenised_command)

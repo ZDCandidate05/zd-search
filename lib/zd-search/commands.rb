@@ -59,29 +59,45 @@ module ZDSearch
                 # only part of the codebase that cares, so... ¯\_(ツ)_/¯
                 case @object_type
                 when 'organization'
-                    ticket_matches = index.hashes_for matched_object['_id'], restrict_type: 'ticket', restrict_field: 'organization_id'
-                    user_matches = index.hashes_for matched_object['_id'], restrict_type: 'user', restrict_field: 'organization_id'
+                    ticket_matches = if matched_object['_id']
+                        index.hashes_for matched_object['_id'], restrict_type: 'ticket', restrict_field: 'organization_id'
+                    end
+                    user_matches = if matched_object['_id']
+                        index.hashes_for matched_object['_id'], restrict_type: 'user', restrict_field: 'organization_id'
+                    end
                     next {
-                        '_tickets' => ticket_matches.map { |t| t.slice('_id', 'subject')},
-                        '_users' => user_matches.map { |t| t.slice('_id', 'name')},
+                        '_tickets' => ticket_matches&.map { |t| t.slice('_id', 'subject')},
+                        '_users' => user_matches&.map { |t| t.slice('_id', 'name')},
                     }.merge(matched_object)
                 when 'ticket'
-                    asignee_matches = index.hashes_for matched_object['asignee_id'], restrict_type: 'user', restrict_field: '_id'
-                    submitter_matches = index.hashes_for matched_object['submitter_id'], restrict_type: 'user', restrict_field: '_id'
-                    organization_matches = index.hashes_for matched_object['organization_id'], restrict_type: 'organization', restrict_field: '_id'
+                    asignee_matches = if matched_object['assignee_id']
+                        index.hashes_for matched_object['assignee_id'], restrict_type: 'user', restrict_field: '_id'
+                    end
+                    submitter_matches = if matched_object['submitter_id']
+                        index.hashes_for matched_object['submitter_id'], restrict_type: 'user', restrict_field: '_id'
+                    end
+                    organization_matches = if matched_object['organization_id']
+                        index.hashes_for matched_object['organization_id'], restrict_type: 'organization', restrict_field: '_id'
+                    end
                     next {
-                        '_assignee' => asignee_matches.map { |t| t.slice('_id', 'name') },
-                        '_submitter' => submitter_matches.map { |t| t.slice('_id', 'name') },
-                        '_organization' => organization_matches.map { |t| t.slice('_id', 'name') },
+                        '_assignee' => asignee_matches&.map { |t| t.slice('_id', 'name') },
+                        '_submitter' => submitter_matches&.map { |t| t.slice('_id', 'name') },
+                        '_organization' => organization_matches&.map { |t| t.slice('_id', 'name') },
                     }.merge(matched_object)
                 when 'user'
-                    asignee_matches = index.hashes_for matched_object['_id'], restrict_type: 'ticket', restrict_field: 'asignee_id'
-                    submitter_matches = index.hashes_for matched_object['_id'], restrict_type: 'ticket', restrict_field: 'submitter_id'
-                    organization_matches = index.hashes_for matched_object['organization_id'], restrict_type: 'organization', restrict_field: '_id'
+                    asignee_matches = if matched_object['_id']
+                        index.hashes_for matched_object['_id'], restrict_type: 'ticket', restrict_field: 'assignee_id'
+                    end
+                    submitter_matches = if matched_object['_id']
+                        index.hashes_for matched_object['_id'], restrict_type: 'ticket', restrict_field: 'submitter_id'
+                    end
+                    organization_matches = if matched_object['organization_id']
+                        index.hashes_for matched_object['organization_id'], restrict_type: 'organization', restrict_field: '_id'
+                    end
                     next {
-                        '_assigned_tickets' => asignee_matches.map { |t| t.slice('_id', 'subject') },
-                        '_submitted_tickets' => submitter_matches.map { |t| t.slice('_id', 'subject') },
-                        '_organization' => organization_matches.map { |t| t.slice('_id', 'name') },
+                        '_assigned_tickets' => asignee_matches&.map { |t| t.slice('_id', 'subject') },
+                        '_submitted_tickets' => submitter_matches&.map { |t| t.slice('_id', 'subject') },
+                        '_organization' => organization_matches&.map { |t| t.slice('_id', 'name') },
                     }.merge(matched_object)
 
                 end 

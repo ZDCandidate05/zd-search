@@ -1,4 +1,3 @@
-require 'zd-search/command_parser'
 require 'zd-search/commands'
 
 describe 'Commands' do
@@ -128,7 +127,7 @@ describe 'Commands' do
                     '_id' => 'three',
                     'organization_id' => 1,
                     'submitter_id' => 1,
-                    'asignee_id' => 4,
+                    'assignee_id' => 4,
                 })
                 index_builder.index({
                     '_type' => 'ticket',
@@ -136,7 +135,7 @@ describe 'Commands' do
                     '_id' => 'one',
                     'organization_id' => 1,
                     'submitter_id' => 1,
-                    'asignee_id' => 4,
+                    'assignee_id' => 4,
                 })
                 index_builder.index({
                     '_type' => 'ticket',
@@ -144,7 +143,7 @@ describe 'Commands' do
                     '_id' => 'two',
                     'organization_id' => 2,
                     'submitter_id' => 3,
-                    'asignee_id' => 5,
+                    'assignee_id' => 5,
                 })
                 @index = index_builder.build_index!
             end
