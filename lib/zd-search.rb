@@ -2,7 +2,7 @@
 
 # Constants that are used in multiple places
 module ZDSearch
-    OBJECT_TYPES = %w(organisation ticket user)
+    OBJECT_TYPES = %w(organization ticket user)
 end
 
 

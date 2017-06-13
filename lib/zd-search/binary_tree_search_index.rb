@@ -74,7 +74,7 @@ module ZDSearch
 
         # Returns a list of (object, field_name) pairs in our index for the specific token
         # Specify restrict_field to restrict returned matches to a particular field.
-        def matches_for(search_term, restrict_field: nil)
+        def matches_for(search_term, restrict_field: nil, restrict_type: nil)
             # Tokenise the search term, so that it will match the format of what we indexed
             search_term = @tokeniser.tokens_for_value(search_term).first
             return [] if search_term.nil?
@@ -89,8 +89,15 @@ module ZDSearch
             # The #select call is important even in the restrict_field: nil
             # case because it prevents us from returning the matches list for mutation.
             return matches.select do |match|
-                match.field == restrict_field || restrict_field.nil?
+                (match.field == restrict_field || restrict_field.nil?) &&
+                    (match.hash['_type'] == restrict_type || restrict_type.nil?)
             end
+        end
+
+        # Trivial wrapper around matches_for that only returns the found objects, discarding
+        # the field info
+        def hashes_for(*args)
+            return matches_for(*args).map { |match| match.hash }
         end
 
         # The only reason this stupid method is needed is because TrueClass and

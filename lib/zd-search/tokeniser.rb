@@ -8,6 +8,7 @@ module ZDSearch
 
         # This would be in dire need of internationalisation in the real world -
         # probably by reading up on the appropriate unicode character classes
+        # TODO: relax this something serious. Otherwise stuff'l break
         STRING_TOKENIZE_PATTERN = /[^A-Za-z0-9']/
 
         def tokens_for_value(value)

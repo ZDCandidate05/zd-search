@@ -9,11 +9,12 @@ describe ZDSearch::BinaryTreeSearchIndex do
 
     let(:o1) { {
         'oink' => 3,
-        'bork' => 'Some super long and DESCRIPTIVE text',
+        'bork' => 'Some super long and DESCRIPTIVE (& useful!) text',
         'quark' => 'Less borkey text',
         'is_quack' => true,
         'honk' => [ 'Other', 'Pieces' ],
         'eek' => 4,
+        '_type' => 'eel',
     } }
 
     let(:o2) { {
@@ -23,15 +24,17 @@ describe ZDSearch::BinaryTreeSearchIndex do
         'is_quack' => false,
         'honk' => [ 'Other', 'Pieces' ],
         'eek' => 1,
+        '_type' => 'eel',
     } }
 
     let(:o3) { {
         'oink' => 34,
-        'bork' => "definitely borks (and barks, can't it?) pretty hard.",
+        'bork' => "definitely borks (and barks, can't it?) pretty hard and is useful.",
         'quark' => '',
         'is_quack' => true,
         'honk' => [ 'Other', 'Pieces' ],
         'eek' => 0,
+        '_type' => 'salmon',
     } }
 
     describe 'string searches' do
@@ -148,6 +151,18 @@ describe ZDSearch::BinaryTreeSearchIndex do
             expect(matches).to have(2).items
             expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o1, 'bork'))
             expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o2, 'bork'))
+        end
+    end
+
+    describe 'restrict_type' do
+        it 'filters by _type if restrict_typeis provided' do
+            @index_builder.index(o1)
+            @index_builder.index(o2)
+            @index_builder.index(o3)
+            ix = @index_builder.build_index!
+            matches = ix.matches_for('useful', restrict_type: 'salmon')
+            expect(matches).to have(1).items
+            expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o3, 'bork'))
         end
     end
 end

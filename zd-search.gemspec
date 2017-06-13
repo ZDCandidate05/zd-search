@@ -10,4 +10,5 @@ Gem::Specification.new do |s|
     s.files = Dir['bin/*'] + Dir['lib/**/*.rb'] + Dir['spec/**/*.rb']
 
     s.add_dependency('trollop', '~> 2')
+    s.add_dependency('activesupport', '~> 5')
 end
