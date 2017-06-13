@@ -221,28 +221,28 @@ describe 'Commands' do
         end
     end
 
-    describe '::parse_fields_command' do
+    describe ZDSearch::FieldsCommand do
         it 'rejects if no object type is specified' do
             expect {
-                ZDSearch::CommandParser.parse_fields_command(['fields'])
-            }.to raise_error(ZDSearch::CommandParser::FieldsCommandError)
+                ZDSearch::FieldsCommand.new(['fields'])
+            }.to raise_error(ZDSearch::FieldsCommand::ParseError)
         end
 
         it 'rejects if the type is not valid' do
             expect {
-                ZDSearch::CommandParser.parse_fields_command(['fields', 'some_random_type'])
-            }.to raise_error(ZDSearch::CommandParser::FieldsCommandError)
+                ZDSearch::FieldsCommand.new(['fields', 'some_random_type'])
+            }.to raise_error(ZDSearch::FieldsCommand::ParseError)
         end
 
         it 'rejects if there are extra arguments' do
             expect {
-                ZDSearch::CommandParser.parse_fields_command(['fields', 'ticket', 'foobar'])
-            }.to raise_error(ZDSearch::CommandParser::FieldsCommandError)
+                ZDSearch::FieldsCommand.new(['fields', 'ticket', 'foobar'])
+            }.to raise_error(ZDSearch::FieldsCommand::ParseError)
         end
 
         it 'succeeds on valid types' do
-            command = ZDSearch::CommandParser.parse_fields_command(['fields', 'ticket'])
-            expect(command.type).to eql('ticket')
+            command = ZDSearch::FieldsCommand.new(['fields', 'ticket'])
+            expect(command.object_type).to eql('ticket')
         end
     end
 end

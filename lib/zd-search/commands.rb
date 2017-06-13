@@ -88,4 +88,28 @@ module ZDSearch
             end
         end
     end
+
+    class FieldsCommand
+        class ParseError < StandardError
+            def initialize(code)
+                @code = code
+            end
+            attr_reader :code
+        end
+
+        # Creates the command object based on the tokens from the CLI command entered
+        # Needs to be of the form ['fields', 'object_type']
+        # Raises a ParseError if the command text is invalid in some way.
+        def initialize(command_tokens)
+            @object_type = command_tokens[1]
+            raise ParseError.new(:err_no_object_type) unless @object_type
+            if !ZDSearch::OBJECT_TYPES.include?(@object_type)
+                raise ParseError.new(:err_invalid_object_type)
+            end
+
+            raise ParseError.new(:err_extra_arguments) if command_tokens.size > 2
+        end
+
+        attr_reader :object_type
+    end
 end
