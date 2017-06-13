@@ -142,7 +142,12 @@ module ZDSearch
 
         def run_search_command(tokenised_command)
             # Delegate to a SearchCommand object
-            cmd = ZDSearch::SearchCommand.new(tokenised_command)
+            cmd = begin
+                ZDSearch::SearchCommand.new(tokenised_command)
+            rescue ZDSearch::SearchCommand::ParseError => e
+                puts "Malformed command (try `help` for usage instructions)"
+                return
+            end
             results = cmd.execute(@search_index)
 
             printf "%-20s %s\n", "Field name", "Value"
@@ -157,8 +162,14 @@ module ZDSearch
         end
 
         def run_fields_command(tokenised_command)
-            cmd = ZDSearch::FieldsCommand.new(tokenised_command)
+            cmd = begin
+                ZDSearch::FieldsCommand.new(tokenised_command)
+            rescue ZDSearch::FieldsCommand::ParseError => e
+                puts "Malformed command (try `help` for usage instructions)"
+                return
+            end
             results = cmd.execute(@search_index)
+
 
             # Print out the known field values in 3 columns
             results.each_slice(3) do |fields|
