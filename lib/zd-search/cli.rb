@@ -157,7 +157,13 @@ module ZDSearch
         end
 
         def run_fields_command(tokenised_command)
-            puts "Comming soon."
+            cmd = ZDSearch::FieldsCommand.new(tokenised_command)
+            results = cmd.execute(@search_index)
+
+            # Print out the known field values in 3 columns
+            results.each_slice(3) do |fields|
+                printf "%-40s %-20s %s\n", fields[0] || "", fields[1] || "", fields[2] || ""
+            end
         end
     end
 end

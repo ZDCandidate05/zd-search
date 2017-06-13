@@ -127,5 +127,9 @@ module ZDSearch
         end
 
         attr_reader :object_type
+
+        def execute(index)
+            return index.fields_for_type @object_type
+        end
     end
 end

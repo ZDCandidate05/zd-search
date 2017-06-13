@@ -16,12 +16,11 @@ module ZDSearch
         LITERAL_FIELDS = %w(url _id email domain_names external_id)
 
         def tokens_for_value(value, field_name = nil)
-            return [value] if LITERAL_FIELDS.include?(field_name)
-
             # Numbers & booleans just tokenise to themselves
             if value.is_a?(Integer) || value.is_a?(Float) || value == true || value == false
                 return [value]
             elsif value.is_a?(String)
+                return [value] if LITERAL_FIELDS.include?(field_name)
                 # If this were a real search app, we'd do things like stemming and ignoring
                 # stopwords here. We don't need to support any of that however :)
                 # Note that STRING_TOKENISE_PATTERN includes not only includes things you'd think

@@ -30,6 +30,8 @@ module ZDSearch
                     :boolean => ZDSearch::BinaryTree.new,
                 }
                 @tokeniser = tokeniser
+                # Keep track of what fields are available on what objects.
+                @field_mapping = {}
             end
 
             # Indexes the given hash into the index we're building. Pulls out all the
@@ -41,6 +43,9 @@ module ZDSearch
                         matches_by_token[token] ||= []
                         matches_by_token[token] << Match.new(hash, field_name)
                     end
+
+                    @field_mapping[hash['_type']] ||= Set.new
+                    @field_mapping[hash['_type']] << field_name
                 end
 
                 # Put the matches into the appropriate index depending on token type
@@ -63,13 +68,18 @@ module ZDSearch
                 balanced_trees = Hash[
                     @index_trees.map { |type, tree| [type, tree.balanced_copy] }
                 ]
-                return ZDSearch::BinaryTreeSearchIndex.new(sorted_index_trees: balanced_trees, tokeniser: @tokeniser)
+                return ZDSearch::BinaryTreeSearchIndex.new(
+                    sorted_index_trees: balanced_trees,
+                    tokeniser: @tokeniser,
+                    field_mapping: @field_mapping,
+                )
             end
         end
 
-        def initialize(sorted_index_trees:, tokeniser:)
+        def initialize(sorted_index_trees:, tokeniser:, field_mapping:)
             @sorted_index_trees = sorted_index_trees
             @tokeniser = tokeniser
+            @field_mapping = field_mapping
         end
 
         # Returns a list of (object, field_name) pairs in our index for the specific token
@@ -98,6 +108,11 @@ module ZDSearch
         # the field info
         def hashes_for(*args)
             return matches_for(*args).map { |match| match.hash }
+        end
+
+        # Tells the caller about the fields we know about for a given _type
+        def fields_for_type(type)
+            return @field_mapping[type] || Set.new
         end
 
         # The only reason this stupid method is needed is because TrueClass and

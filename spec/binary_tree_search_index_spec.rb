@@ -178,4 +178,15 @@ describe ZDSearch::BinaryTreeSearchIndex do
             expect(matches).to include(ZDSearch::BinaryTreeSearchIndex::Match.new(o3, 'bork'))
         end
     end
+
+    describe '#fields_for_type' do
+        it 'keeps a list of field names for each _type' do
+            @index_builder.index(o1)
+            @index_builder.index(o2)
+            @index_builder.index(o3)
+            ix = @index_builder.build_index!
+            expect(ix.fields_for_type('eel').to_a).to match(o1.keys | o2.keys)
+            expect(ix.fields_for_type('salmon').to_a).to match(o3.keys)
+        end
+    end
 end
